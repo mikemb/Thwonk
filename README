@@ -1,0 +1,11 @@
+Version: Alpha 00002
+
+14th Dec 2011
+
+This is the initial integrated tarball, where sub-packages are on different version numbers.
+
+- backend (alpha 00002)
+  Contains the backend code for daemons and database design
+
+- (Removed from first public GIT commit - will be added back) frontend (alpha 00003)
+  Contains django web frontend and startup scripts for launching

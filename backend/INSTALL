@@ -1,0 +1,151 @@
+How to Install THWONK 
+=====================
+Author: Mike Bennett (mike@thwonk.com)
+
+Hi welcome to THWONK!
+
+In this document I explain how you can setup THWONK on a Unix server
+and integrate it into your mail system.
+
+If you have questions or suggestions you can visit:
+     http://www.thwonk.com
+for further help and assistance.
+
+This help file is aimed at those of you who are building THWONK from
+source code.
+
+BTW if you'd like to help us get THWONK working on other platforms,
+such Windows servers, please get in contact.
+
+Enjoy,
+Mike
+
+
+Index
+=====
+0. Building THWONK - how to build and install
+1. Requirements - what librarys and programs are needed
+2. Database - how to setup the THWONK SQL database
+3. Website - setting up THWONK's web front end
+4. Mail Integration - directing mail to THWONK
+5. Testing - confirming THWONK is setup and working correctly
+6. Compiling - what compile time options are available in THWONK
+7. Building SpiderMonkey - compiling JavaScript SpiderMonkey
+8. Library Versions Confirmed To Work
+
+
+
+0. Building THWONK
+==================
+THWONK consists of two main components:
+
+1) frontend website, which runs on Django with python
+
+2) backend daemons, which process incoming messages, run javascripts, etc.
+
+THWONK backend comes with standard configure and make scripts.
+
+
+1. Requirements
+===============
+
+THWONK requires that the installation server has the following
+programs and libraries:
+
+- web server such as Apache or Lighttpd 1.4+
+
+- postfix or equivalent MTA
+
+- database currently MySQL 5.0+
+
+- Django with python mysqldb
+
+- mailutils 1.1+ development library (libmailbox) and headers - available
+  at http://www.gnu.org/software/mailutils
+
+- spidermonkey 1.6+ development library (libjs) and headers - available
+  at http://www.mozilla.org/js/spidermonkey (see section 7 below for details)
+  
+Note: The version numbers listed above aren't fixed. We know that
+THWONK works with at least that version of the programs and libraries. In
+most cases it'll probably work with earlier versions.
+
+
+2. Database
+===========
+
+THWONK currently only supports MySQL. If you're interested you could easily
+extend THWONK to support other database, such as PostgreSQL.
+
+When you compile thwonk you'll need to edit codewide.h to setup the database
+username (SET_DBUSER), password (SET_DBPWORD) and whether its accessed via a
+socket (SET_DBSOCKET) or server (SET_DBDOMAIN).
+
+
+4. Mail Integration
+===================
+
+mailinject should be setup with:
+
+- chmod 4755 mailinject as root user, set the sticky bit on it. This is
+  needed because mailinject chroots to the directory you set (SET_JAIL)
+  in codewide.h then switches to the user nobody before running (SET_RUNASUSER)
+
+- a world writeable tmp folder should be in the folder mailinject chroots to
+
+- mailinject should be added to a .forward file which should have the
+  following line:
+		|/home/thwonk/thwonk/bin/mailinject
+
+- the .forward file should be in an account that can receive email, and
+  depending on whether THWONK is running for one email address, or for
+  many, you may need to edit your mail server setup, e.g. in postfix I've
+  for a development server I've used (where thwonk.com is set to 127.0.0.1):
+    virtual_alias_domains = thwonk.com
+    virtual_alias_maps = hash:/etc/postfix/virtual
+
+- in codewide.h set SET_DOMAIN to the domain that thwonk receives mail on,
+  e.g. if mail is sent to test@play.thwonk.com then SET_DOMAIN should be
+  play.thwonk.com
+
+ 
+7. Compiling SpiderMonkey
+=========================
+
+* Using OSSP's SpiderMonkey *
+
+Rather than having to mess around compiling SpiderMonkey you could use
+OSSP's cleaned up build of spidermonkey which is available at:
+		http://www.ossp.org/pkg/lib/js
+This version uses an autotools build env and automatically installs headers
+and libraries in suitable places.
+
+* Building Standard Version *
+
+When you're compiling spidermonkey I cannot recommend strongly
+enough that you compile in it non-DEBUG/TEST mode and turn on compiler
+optimizations. It makes a MASSIVE difference to how fast javascript rules
+run. In js/src use (something like):
+
+ make -f Makefile.ref BUILD_OPT=1 OPTIMIZER="-O3 -mtune=k8 -march=k8
+ 	-pipe -fomit-frame-pointer
+
+You may need to change the build command line depending on the architecture
+you are building on, i.e. you shouldn't set mtune to k8 unless you're
+going to be running THWONK on an AMD 64 bit processor, and you definitely
+shouldn't use march unless you know what it does.
+
+To install your own version of spidermonkey copy the libjs file to a location
+such as /usr/local/lib and the *.h/*.tbl files to /usr/local/include. Don't
+forget you might need to add the path to the libjs to ld.so.conf (and run
+ldconfing -v or put the path to libjs.so in your LD_LIBRARY_PATH).
+
+
+8. Library Versions Confirmed To Work
+=====================================
+List of libraries that THWONK depends on, along with version numbers that
+it works on.
+
+- mailutils 1.2
+- spidermonkey 1.6
+ 

@@ -1,0 +1,21 @@
+SHORT TERM
+==========
+- move to holding values returned by queries in my_ulonglong rather than long
+
+- add code for parsing mail headers and body
+
+- check how to do msg rate flow for mail server so rate flow can be
+  controlled on mail server
+
+- maybe remove DEFINES and replace with enum, will improve code checks
+
+- move hardcoded config options to external file and database
+
+
+LONG TERM
+=========
+- Use a generic layer for talking to database so could use PostgreSQL
+  or another database instead of only MySQL
+
+- Port to Windows
+
