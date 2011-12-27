@@ -37,7 +37,7 @@ JSClass js_global_object_class = {
  * 	FAILURE = ERR_* (type of error)
 */
 ERRTYPE spawnRuleRunner(Queue_Entry *qentry) {
-	JSScript *script = NULL;
+	JSObject *script = NULL;
 	JSRuntime *rt = NULL;
 	JSContext *cx = NULL;
 	JSObject *obj = NULL;

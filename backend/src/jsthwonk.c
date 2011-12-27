@@ -91,6 +91,7 @@ JSObject *createJSObjectThwonk(JSContext *cx, JSObject *obj, Queue_Entry *qentry
 */
 JSBool jsObjectThwonk_print(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 	int i;
+	char *str;
 	size_t amount = 0;
 
 	if(argc < 1) {
@@ -100,8 +101,12 @@ JSBool jsObjectThwonk_print(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
 
 	for(i = 0; i < argc; i++) {
 		JSString *val = JS_ValueToString(cx, argv[i]);
-		char *str = JS_GetStringBytes(val);
-		amount += fwrite(str, sizeof(*str), JS_GetStringLength(val), stdout);
+		str = JS_EncodeString(cx, val);
+
+		if(str != NULL) {
+			amount += fwrite(str, sizeof(*str), JS_GetStringEncodingLength(cx, val), stdout);
+			free(str);
+		}
 	}
 
 	*rval = INT_TO_JSVAL(amount);
@@ -298,9 +303,9 @@ JSBool jsObjectThwonk_message_sendMember(JSContext *cx, JSObject *obj, uintN arg
 	}
 
 	// Lets get the fields for sending the mail
-	userUnsafe = JS_GetStringBytes(JS_ValueToString(cx, argv[1]));
-	subjectUnsafe = JS_GetStringBytes(JS_ValueToString(cx, argv[2]));
-	bodyUnsafe = JS_GetStringBytes(JS_ValueToString(cx, argv[3]));
+	userUnsafe = JS_EncodeString(cx, JS_ValueToString(cx, argv[1]));
+	subjectUnsafe = JS_EncodeString(cx, JS_ValueToString(cx, argv[2]));
+	bodyUnsafe = JS_EncodeString(cx, JS_ValueToString(cx, argv[3]));
 //	bodyUnsafe = JS_GetStringBytes(JS_GetStringChars(JS_ValueToString(cx, argv[3])));
 //	bodyUnsafe = JS_GetStringBytes(JSVAL_TO_STRING(argv[3]));
 
@@ -313,6 +318,12 @@ JSBool jsObjectThwonk_message_sendMember(JSContext *cx, JSObject *obj, uintN arg
 	subject = dbEscapeString(subjectUnsafe, strlen(subjectUnsafe));
 	body = dbEscapeString(bodyUnsafe, strlen(bodyUnsafe));
 
+	// JS_EncodeString uses mallocs, so have to free that to prevent memory leaks
+	free(userUnsafe);
+	free(subjectUnsafe);
+	free(bodyUnsafe);
+
+	// Now check was escaping of unsafe strings successful
 	if(user == NULL || subject == NULL || bodyUnsafe == NULL) {
 		*rval = INT_TO_JSVAL(TJS_FAILURE);
 		return JS_TRUE;
@@ -372,9 +383,6 @@ JSBool jsObjectThwonk_message_sendMember(JSContext *cx, JSObject *obj, uintN arg
  * Exit:
  * 	SUCCESS - rval = Content of current message
  * 	FAILURE - rval = TJS_FAILURE
- *
- * TODO:
- * 	Free mem allocated by JS_GetStringBytes()
 */
 JSBool jsObjectThwonk_file_read(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 	VFile_Entry *vfile;
@@ -387,7 +395,7 @@ JSBool jsObjectThwonk_file_read(JSContext *cx, JSObject *obj, uintN argc, jsval 
 		return JS_TRUE;
 	}
 
-	nameUnsafe = JS_GetStringBytes(JS_ValueToString(cx, argv[0]));
+	nameUnsafe = JS_EncodeString(cx, JS_ValueToString(cx, argv[0]));
 
 	if(nameUnsafe == NULL) {
 		*rval = INT_TO_JSVAL(TJS_FAILURE);
@@ -395,6 +403,8 @@ JSBool jsObjectThwonk_file_read(JSContext *cx, JSObject *obj, uintN argc, jsval 
 	}
 
 	name = dbEscapeString(nameUnsafe, strlen(nameUnsafe));
+
+	free(nameUnsafe);		// Don't leak memory
 
 	if(name == NULL) {
 		*rval = INT_TO_JSVAL(TJS_FAILURE);
@@ -439,9 +449,6 @@ JSBool jsObjectThwonk_file_read(JSContext *cx, JSObject *obj, uintN argc, jsval 
  * Exit:
  * 	SUCCESS - rval = TJS_SUCCESS
  * 	FAILURE - rval = TJS_FAILURE
- *
- * TODO:
- * 	Free mem allocated by JS_GetStringBytes()
 */
 JSBool jsObjectThwonk_file_write(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 	Queue_Entry *qentry;
@@ -453,8 +460,8 @@ JSBool jsObjectThwonk_file_write(JSContext *cx, JSObject *obj, uintN argc, jsval
 		return JS_TRUE;
 	}
 
-	nameUnsafe = JS_GetStringBytes(JS_ValueToString(cx, argv[0]));
-	contentUnsafe = JS_GetStringBytes(JS_ValueToString(cx, argv[1]));
+	nameUnsafe = JS_EncodeString(cx, JS_ValueToString(cx, argv[0]));
+	contentUnsafe = JS_EncodeString(cx, JS_ValueToString(cx, argv[1]));
 
 	if(nameUnsafe == NULL || contentUnsafe == NULL) {
 		*rval = INT_TO_JSVAL(TJS_FAILURE);
@@ -463,6 +470,9 @@ JSBool jsObjectThwonk_file_write(JSContext *cx, JSObject *obj, uintN argc, jsval
 
 	name = dbEscapeString(nameUnsafe, strlen(nameUnsafe));
 	content = dbEscapeString(contentUnsafe, strlen(contentUnsafe));
+
+	free(nameUnsafe);
+	free(contentUnsafe);
 
 	if(name == NULL || content == NULL) {
 		*rval = INT_TO_JSVAL(TJS_FAILURE);
@@ -502,16 +512,11 @@ JSBool jsObjectThwonk_file_write(JSContext *cx, JSObject *obj, uintN argc, jsval
  * 	Message printed to screen
 */
 JSBool jsObjectThwonk_dummy(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-	char *str;
+	JSString *jstr;
 
 	printf("jsObjectThwonk_dummy() called\r\n");
 
-	str = JS_malloc(cx, strlen("moo") + 1);
-
-	strncpy(str, "moo", strlen("moo"));
-	str[strlen("moo")] = '\0';
-
-	JSString *jstr = JS_NewString(cx, str, strlen(str));
+	jstr = JS_NewStringCopyZ(cx, "moo");
 
 	*rval = STRING_TO_JSVAL(jstr);
 

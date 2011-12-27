@@ -1,3 +1,27 @@
+IMMEDIATE
+=========
+- tweaked msgqueue.c line 382, setErrType(WEXITSTATUS(status)) was incorrect, as setErrType()
+  should only have been passed in a ERRTYPE enum. Test effects and patch to also record status
+
+- in spidermonkey 1.8.5 JS_NewString is obsolete - tweaked to use JS_NewStringCopyZ, check 
+  jsObjectThwonk_dummy() still works from javascript
+
+- patched jsObjectThwonk_print to use JS_EncodeString rather than JS_GetStringBytes which is
+  obsolete in recent spidermonkey version. Test whether works
+
+- suspect there's a memory leak in jsObjectThwonk_message_sendMember, repeat calls could eat
+  up memory on failure to successfully dbEscapeString (for example if body fails user and subject
+  memory isn't freed)
+
+- patched jsObjectThwonk_file_read and jsObjectThwonk_file_write to use JS_EncodeString, check do
+  they work
+
+
+NEXT
+====
+- move hardcoded config options to external file and database
+
+
 SHORT TERM
 ==========
 - move to holding values returned by queries in my_ulonglong rather than long
@@ -8,8 +32,6 @@ SHORT TERM
   controlled on mail server
 
 - maybe remove DEFINES and replace with enum, will improve code checks
-
-- move hardcoded config options to external file and database
 
 
 LONG TERM

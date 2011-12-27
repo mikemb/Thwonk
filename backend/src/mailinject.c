@@ -8,6 +8,7 @@
 
 #include<stdio.h>
 #include<stdlib.h>
+#include<strings.h>
 #include "setupthang.h"
 #include "logerror.h"
 #include "dbchatter.h"

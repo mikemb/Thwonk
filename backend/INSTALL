@@ -1,6 +1,6 @@
 How to Install THWONK 
 =====================
-Author: Mike Bennett (mike@thwonk.com)
+Author: Mike Bennett (mikemb@stanford.edu)
 
 Hi welcome to THWONK!
 
@@ -112,33 +112,21 @@ mailinject should be setup with:
 7. Compiling SpiderMonkey
 =========================
 
-* Using OSSP's SpiderMonkey *
-
-Rather than having to mess around compiling SpiderMonkey you could use
-OSSP's cleaned up build of spidermonkey which is available at:
-		http://www.ossp.org/pkg/lib/js
-This version uses an autotools build env and automatically installs headers
-and libraries in suitable places.
-
-* Building Standard Version *
+Thwonk previously used Spidermonkey 1.6, and that had a overly compiled build
+process. Spidermonkey 1.8.5 has a standard "configure" build script.
 
 When you're compiling spidermonkey I cannot recommend strongly
 enough that you compile in it non-DEBUG/TEST mode and turn on compiler
 optimizations. It makes a MASSIVE difference to how fast javascript rules
-run. In js/src use (something like):
+run.
 
- make -f Makefile.ref BUILD_OPT=1 OPTIMIZER="-O3 -mtune=k8 -march=k8
- 	-pipe -fomit-frame-pointer
+You may also want to compile Spidermonkey for your architecture, e.g.
+ CFLAGS='-O3 -mtune=k8 -march=k8 -pipe -fomit-frame-pointer' ./configure
 
-You may need to change the build command line depending on the architecture
+You will need to change the build command line depending on the architecture
 you are building on, i.e. you shouldn't set mtune to k8 unless you're
 going to be running THWONK on an AMD 64 bit processor, and you definitely
-shouldn't use march unless you know what it does.
-
-To install your own version of spidermonkey copy the libjs file to a location
-such as /usr/local/lib and the *.h/*.tbl files to /usr/local/include. Don't
-forget you might need to add the path to the libjs to ld.so.conf (and run
-ldconfing -v or put the path to libjs.so in your LD_LIBRARY_PATH).
+shouldn't use march unless you know why.
 
 
 8. Library Versions Confirmed To Work
@@ -146,6 +134,6 @@ ldconfing -v or put the path to libjs.so in your LD_LIBRARY_PATH).
 List of libraries that THWONK depends on, along with version numbers that
 it works on.
 
-- mailutils 1.2
-- spidermonkey 1.6
+- mailutils 2.2 (may work with 1.2)
+- spidermonkey 1.8.5
  

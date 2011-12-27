@@ -315,7 +315,10 @@ bool runQueueThreads(ERRTYPE (*worker)(Queue_Entry *), int numThreads, int queue
 				if(WIFEXITED(status) != true && WIFSIGNALED(status) == true) {
 					setErrType(ERR_PROC_KILLED);
 				} else {
-					setErrType(WEXITSTATUS(status));
+// TODO:  Rewrite so properly reports an error status, at the moment setErrType takes in
+//  enums so won't behave properly with int returned by WEXITSTATUS
+//					setErrType(WEXITSTATUS(status));
+					setErrType(ERR_UNKNOWN);
 				}
 
 				// Check whether there was a threading error, and if need be

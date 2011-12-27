@@ -32,7 +32,7 @@
 
 #define SET_BUMPLIST_TO		"thelist@thwonk.com"
 
-//#define SET_DBSERVER	"localhost"
+#define SET_DBSERVER	"localhost"
 //#define SET_DBSERVER	"127.0.0.1"
 //#define SET_DBSOCKET	"/var/run/mysqld/mysqld.sock"
 #define SET_DBSOCKET	NULL

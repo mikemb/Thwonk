@@ -207,7 +207,7 @@ char *buildMessageOut(long id) {
 	User_Filter *fromUserFilter, *toUserFilter;
 	Void_Filter *replytoVoidFilter;
 
-	outMsg = malloc(sizeof(char) * 10000);
+	outMsg = (char *)malloc(sizeof(char) * 10000);
 
 	if((mentry = getMessageEntryById(id)) == NULL) {
 		return NULL;

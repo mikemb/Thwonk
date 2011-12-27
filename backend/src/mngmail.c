@@ -7,7 +7,7 @@
 */
 
 #include<stdlib.h>
-#include<strings.h>
+#include<string.h>
 #include "setupthang.h"
 #include "mngmail.h"
 #include "message.h"

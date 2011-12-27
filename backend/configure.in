@@ -6,7 +6,8 @@ AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 dnl AC_CANONICAL_HOST
 AM_MAINTAINER_MODE
 
-AC_PROG_CC
+dnl AC_PROG_CC
+AC_PROG_CXX
 AC_PROG_INSTALL
 
 dnl Make sure required headers are available
@@ -33,15 +34,18 @@ AC_SUBST(MYSQL_CFLAGS, `mysql_config --cflags`)
 
 dnl Check for spidermonkey library and headers
 
-#PKG_CHECK_MODULES(SPIDERMONKEY, js)
-#AC_SUBST(SPIDERMONKEY_CFLAGS)
-#AC_SUBST(SPIDERMONKEY_LIBS)
+AC_CHECK_PROG(SPIDERMONKEY, js-config , "yes", "no")
 
-AC_CHECK_HEADER(jsapi.h)
-AC_CHECK_LIB(js, JS_NewObject, AC_SUBST(SPIDERMONKEY_LIBS,"-ljs"),
-	AC_MSG_ERROR([Cannot find js (spidermonkey javascript engine) library]))
+if test "$SPIDERMONKEY" != "yes"; then
+	AC_MSG_ERROR([
+		Cannot find js-config (Spidermonkey Javascript engine) - please install the development version of Spidermonkey
+])
+fi
 
-AC_SUBST(SPIDERMONKEY_CFLAGS, "-DXP_UNIX")
+AC_SUBST(SPIDERMONKEY_LIBS, `js-config --libs`)
+AC_SUBST(SPIDERMONKEY_CFLAGS, `js-config --cflags`)
+
+dnl AC_SUBST(SPIDERMONKEY_CFLAGS, "-DXP_UNIX")
 
 dnl Check for mailutils config, library and headers
 AC_CHECK_PROG(MAILUTILS, mailutils-config, "yes", "no")

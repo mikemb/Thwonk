@@ -52,7 +52,7 @@ SCONFIG *initSConfig() {
 SCONFIG *parseCmd(int argc, char **argv) {
 
 	if(_config == NULL) {
-		if(initSConfig(_config) == NULL) {
+		if(initSConfig() == NULL) {
 			return NULL;
 		}
 	}
@@ -74,7 +74,7 @@ SCONFIG *parseCmd(int argc, char **argv) {
 SCONFIG *parseConfig(char *configFile) {
 
 	if(_config == NULL) {
-		if(initSConfig(_config) == NULL) {
+		if(initSConfig() == NULL) {
 			return NULL;
 		}
 	}
