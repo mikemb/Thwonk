@@ -24,6 +24,10 @@ NEXT
 
 SHORT TERM
 ==========
+- JSPROP_ENUMERATE is getting incorrectly set on some native thwonk methods, fix
+
+- See about turning on JSOPTION_METHODJIT for JS_SetOptions() in spawnRuleRunner()
+
 - move to holding values returned by queries in my_ulonglong rather than long
 
 - add code for parsing mail headers and body

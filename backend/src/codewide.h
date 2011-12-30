@@ -13,7 +13,7 @@
 
 #include "config.h"
 
-//#define DEBUG   1
+//#define DEBUG   0			// When defined debugging is on
 #define RELEASESTRING	PACKAGE_STRING " - http://www.thwonk.com"
 
 /*

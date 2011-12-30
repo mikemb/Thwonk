@@ -37,7 +37,7 @@ JSClass jsThwonk_class = {
 	JS_PropertyStub,
 	JS_PropertyStub,
 	JS_PropertyStub,
-	JS_PropertyStub,
+	JS_StrictPropertyStub,
 	JS_EnumerateStub,
 	JS_ResolveStub,
 	JS_ConvertStub,
@@ -45,10 +45,10 @@ JSClass jsThwonk_class = {
 	JSCLASS_NO_OPTIONAL_MEMBERS
 };
 
-JSFunctionSpec jsThwonk_methods[] = {
-	{"print", jsObjectThwonk_print, 0, 0, 0},
-	{"version", jsObjectThwonk_version, 0, 0, 0},
-	{NULL},
+static JSFunctionSpec jsThwonk_methods[] = {
+	JS_FS("print", jsObjectThwonk_print, 0, 0),
+	JS_FS("version", jsObjectThwonk_version, 0, 0),
+	JS_FS_END
 };
 
 
@@ -112,7 +112,7 @@ JSClass jsThwonk_member_class = {
 	JS_PropertyStub,
 	JS_PropertyStub,
 	JS_PropertyStub,
-	JS_PropertyStub,
+	JS_StrictPropertyStub,
 	JS_EnumerateStub,
 	JS_ResolveStub,
 	JS_ConvertStub,
@@ -120,9 +120,9 @@ JSClass jsThwonk_member_class = {
 	JSCLASS_NO_OPTIONAL_MEMBERS
 };
 
-JSFunctionSpec jsThwonk_member_methods[] = {
-	{"test", jsObjectThwonk_dummy, 0, 0, 0},
-	{NULL},
+static JSFunctionSpec jsThwonk_member_methods[] = {
+	JS_FS("test", jsObjectThwonk_dummy, 0, 0),
+	JS_FS_END
 };
 
 #endif

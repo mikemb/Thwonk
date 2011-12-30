@@ -15,9 +15,9 @@
 JSObject *createJSObjectThwonk(JSContext *, JSObject *, Queue_Entry *);
 
 /* Thwonk.* */
-JSBool jsObjectThwonk_dummy(JSContext *, JSObject *, uintN, jsval *, jsval *);
-JSBool jsObjectThwonk_print(JSContext *, JSObject *, uintN, jsval *, jsval *);		// Print a string to STDOUT
-JSBool jsObjectThwonk_version(JSContext *, JSObject *, uintN, jsval *, jsval *);	// Return what is the current version of thwonk
+JSBool jsObjectThwonk_dummy(JSContext *, uintN, jsval *);
+JSBool jsObjectThwonk_print(JSContext *, uintN, jsval *);	// Print a string to STDOUT
+JSBool jsObjectThwonk_version(JSContext *, uintN, jsval *);	// Return what is the current version of thwonk
 
 /* Thwonk.message.* */
 JSBool jsObjectThwonk_message_getCurrent(JSContext *, JSObject *, uintN, jsval *, jsval *);	// Get current message associated with this javascript run

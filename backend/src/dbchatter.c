@@ -181,6 +181,10 @@ DBRESULT *dbQuery(const char *fmt, ...) {
 		return NULL;
 	}
 
+#ifdef DEBUG
+//	write2Log("  * query: %s", query);
+#endif
+
 	free(query);
 
 	// Query done, return a result set if available (depends on query type)

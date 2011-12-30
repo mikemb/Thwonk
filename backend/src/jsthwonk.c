@@ -32,7 +32,7 @@
 JSObject *createJSObjectThwonk(JSContext *cx, JSObject *obj, Queue_Entry *qentry) {
 	JSObject *jsThwonk, *jsObject;
 
-	/* Create Javascript Thwonk object */
+	// Create Javascript Thwonk object 
 	if((jsThwonk = JS_DefineObject(cx, obj, jsThwonk_class.name, &jsThwonk_class, NULL, JSPROP_PERMANENT | JSPROP_READONLY | JSPROP_ENUMERATE)) == NULL) {
 		printf("Couldn't create Thwonk object\n");
 		return NULL;
@@ -40,27 +40,27 @@ JSObject *createJSObjectThwonk(JSContext *cx, JSObject *obj, Queue_Entry *qentry
 
 	JS_DefineFunctions(cx, jsThwonk, jsThwonk_methods);
 
-	/* Create Javascript Thwonk.message object */
+	// Create Javascript Thwonk.message object
 	if((jsObject = JS_DefineObject(cx, jsThwonk, "message", &jsThwonk_message_class, NULL, JSPROP_PERMANENT | JSPROP_READONLY | JSPROP_ENUMERATE)) == NULL) {
 		printf("Couldn't create Thwonk.message object\n");
 		return NULL;
 	}
 
-    // Setup Queue_Entry shared among all message functions
+	// Setup Queue_Entry shared among all message functions
 	JS_SetPrivate(cx, jsObject, qentry);
 	JS_DefineFunctions(cx, jsObject, jsThwonk_message_methods);
 
-	/* Create Javascript Thwonk.file object */
+	// Create Javascript Thwonk.file object
 	if((jsObject = JS_DefineObject(cx, jsThwonk, "file", &jsThwonk_file_class, NULL, JSPROP_PERMANENT | JSPROP_READONLY | JSPROP_ENUMERATE)) == NULL) {
 		printf("Couldn't create Thwonk.file object\n");
 		return NULL;
 	}
 
-    // Setup Queue_Entry shared among all file management functions
+	// Setup Queue_Entry shared among all file management functions
 	JS_SetPrivate(cx, jsObject, qentry);
 	JS_DefineFunctions(cx, jsObject, jsThwonk_file_methods);
 
-	/* Create Javascript Thwonk.member object */
+	// Create Javascript Thwonk.member object 
 	if((jsObject = JS_DefineObject(cx, jsThwonk, "member", &jsThwonk_member_class, NULL, JSPROP_PERMANENT | JSPROP_READONLY | JSPROP_ENUMERATE)) == NULL) {
 		printf("Couldn't create Thwonk.member object\n");
 		return NULL;
@@ -77,27 +77,28 @@ JSObject *createJSObjectThwonk(JSContext *cx, JSObject *obj, Queue_Entry *qentry
  *
  * Entry:
  * 	1st - Context this methods was called from
- * 	2nd - Object associated with this method
- * 	3rd - Number of arguments passed to this method call
+ * 	2nd - Number of arguments passed to this method call
  * 		-- Variable
- * 	4th - Array of arguments
+ * 	3rd - Array of arguments
  * 		-- Strings containing text to print
- *	5th - Value to return from method call
  *
  * Exit:
  * 	Number of bytes written out
  *
  * TODO: Convert so it prints out to a debug field
 */
-JSBool jsObjectThwonk_print(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+JSBool jsObjectThwonk_print(JSContext *cx, uintN argc, jsval *vp) {
 	int i;
 	char *str;
 	size_t amount = 0;
+	jsval *argv;
 
 	if(argc < 1) {
-		*rval = INT_TO_JSVAL(0);
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(0));
 		return JS_TRUE;
 	}
+
+	argv = JS_ARGV(cx, vp);
 
 	for(i = 0; i < argc; i++) {
 		JSString *val = JS_ValueToString(cx, argv[i]);
@@ -109,7 +110,7 @@ JSBool jsObjectThwonk_print(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
 		}
 	}
 
-	*rval = INT_TO_JSVAL(amount);
+	JS_SET_RVAL(cx, vp, INT_TO_JSVAL(amount));
 
 	printf("\n");
 
@@ -123,28 +124,26 @@ JSBool jsObjectThwonk_print(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
  *
  * Entry:
  * 	1st - Context this methods was called from
- * 	2nd - Object associated with this method
- * 	3rd - Number of arguments passed to this method call
+ * 	2nd - Number of arguments passed to this method call
  * 		-- 0
- * 	4th - Array of arguments
+ * 	3rd - Array of arguments
  * 		-- None
- *	5th - Value to return from method call
  *
  * Exit:
  * 	SUCCESS - rval = current version of thwonk
  * 	FAILURE - rval = TJS_FAILURE
 */
-JSBool jsObjectThwonk_version(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+JSBool jsObjectThwonk_version(JSContext *cx, uintN argc, jsval *vp) {
 	JSString *jstr;
 
 	if(argc != 0) {
-		*rval = INT_TO_JSVAL(TJS_FAILURE);
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_FAILURE));
 		return JS_TRUE;
 	}
 
 	jstr = JS_NewStringCopyZ(cx, PACKAGE_VERSION);
 
-	*rval = STRING_TO_JSVAL(jstr);
+	JS_SET_RVAL(cx, vp, STRING_TO_JSVAL(jstr));
 
 	return JS_TRUE;
 }
@@ -511,14 +510,14 @@ JSBool jsObjectThwonk_file_write(JSContext *cx, JSObject *obj, uintN argc, jsval
  * Exit:
  * 	Message printed to screen
 */
-JSBool jsObjectThwonk_dummy(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+JSBool jsObjectThwonk_dummy(JSContext *cx, uintN argc, jsval *vp) {
 	JSString *jstr;
 
 	printf("jsObjectThwonk_dummy() called\r\n");
 
 	jstr = JS_NewStringCopyZ(cx, "moo");
 
-	*rval = STRING_TO_JSVAL(jstr);
+	JS_SET_RVAL(cx, vp, STRING_TO_JSVAL(jstr));
 
 	return JS_TRUE;
 }

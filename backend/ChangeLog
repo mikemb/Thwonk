@@ -1,3 +1,31 @@
+* 29th Dec 2011
+
+	- Re-wrote parts of the code for running Javascript and calling native
+	  C methods from Javascript. Thwonk now runs Javascript again. Patch
+	  is halfway finished. New to keep an eye on the security implications
+	  of switching to Spidermonkey 1.8.5, e.g. File
+
+	- Refactored database initial starting data, it was overly complex
+
+	- Added start of test suite, can test mail injection and javascript
+	  execution
+
+* 26th Dec 2011
+
+	- Patched build and code to work with Spidermonkey 1.8.5 (untested)
+
+	- Updated some docs and todos
+
+	- Patched code where some params weren't getting correctly passed to
+	  functions, i.e. msgqueue.c line 382 setErrType(WEXITSTATUS(status))
+	  was incorrect, as setErrType() should only have been passed in a ERRTYPE enum
+
 * 14th Dec 2011
+
 	- Tweaked code for public release
 	- Removed 2006 to 2011 change logs
+
+* 2006 to 2009
+
+	- Built Thwonk and used it to run BumpList and later on Thwonk website
+	

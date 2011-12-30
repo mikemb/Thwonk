@@ -4,6 +4,7 @@
  * Purpose: Handle interacting with virtual files
 */
 
+#include<string.h>
 #include<stdlib.h>
 #include "setupthang.h"
 #include "logerror.h"
