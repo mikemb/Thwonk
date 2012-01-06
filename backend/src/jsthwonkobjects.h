@@ -32,7 +32,7 @@
  * Javascript: Thwonk object
 */
 JSClass jsThwonk_class = {
-	"Thwonk",
+	"thwonk",
 	0,
 	JS_PropertyStub,
 	JS_PropertyStub,
@@ -61,7 +61,7 @@ JSClass jsThwonk_message_class = {
 	JS_PropertyStub,
 	JS_PropertyStub,
 	JS_PropertyStub,
-	JS_PropertyStub,
+	JS_StrictPropertyStub,
 	JS_EnumerateStub,
 	JS_ResolveStub,
 	JS_ConvertStub,
@@ -70,10 +70,10 @@ JSClass jsThwonk_message_class = {
 };
 
 JSFunctionSpec jsThwonk_message_methods[] = {
-	{"getCurrent", jsObjectThwonk_message_getCurrent, 0, 0, 0},
-	{"sendAll", jsObjectThwonk_message_sendAll, 3, 0, 0},
-	{"sendMember", jsObjectThwonk_message_sendMember, 4, 0, 0},
-	{NULL},
+	JS_FS("getCurrent", jsObjectThwonk_message_getCurrent, 0, 0),
+	JS_FS("sendAll", jsObjectThwonk_message_sendAll, 3, 0),
+	JS_FS("sendMember", jsObjectThwonk_message_sendMember, 4, 0),
+	JS_FS_END
 };
 
 
@@ -86,7 +86,7 @@ JSClass jsThwonk_file_class = {
 	JS_PropertyStub,
 	JS_PropertyStub,
 	JS_PropertyStub,
-	JS_PropertyStub,
+	JS_StrictPropertyStub,
 	JS_EnumerateStub,
 	JS_ResolveStub,
 	JS_ConvertStub,
@@ -97,9 +97,9 @@ JSClass jsThwonk_file_class = {
 JSFunctionSpec jsThwonk_file_methods[] = {
 //	{"open", jsObjectThwonk_file_open, 0, 0, 0},
 //	{"close", jsObjectThwonk_file_close, 0, 0, 0},
-	{"read", jsObjectThwonk_file_read, 1, 0, 0},
-	{"write", jsObjectThwonk_file_write, 2, 0, 0},
-	{NULL},
+	JS_FS("read", jsObjectThwonk_file_read, 1, 0),
+	JS_FS("write", jsObjectThwonk_file_write, 2, 0),
+	JS_FS_END
 };
 
 

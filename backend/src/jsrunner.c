@@ -70,7 +70,7 @@ ERRTYPE spawnRuleRunner(Queue_Entry *qentry) {
 		return ERR_UNKNOWN;
 	}
 
-	JS_SetOptions(cx, JSOPTION_VAROBJFIX | JSOPTION_JIT | JSOPTION_METHODJIT | JSOPTION_COMPILE_N_GO);
+	JS_SetOptions(cx, JSOPTION_VAROBJFIX | JSOPTION_JIT | JSOPTION_COMPILE_N_GO); // JSOPTION_METHODJIT
 	JS_SetVersion(cx, JSVERSION_LATEST);
 
 	JS_SetErrorReporter(cx, jsErrorHandler);
@@ -84,7 +84,7 @@ ERRTYPE spawnRuleRunner(Queue_Entry *qentry) {
 		return ERR_UNKNOWN;
 	}
 
-	if(!JS_InitStandardClasses(cx, global)) {
+	if(JS_InitStandardClasses(cx, global) == false) {
 		JS_DestroyContext(cx);
 		JS_DestroyRuntime(rt);
 		return ERR_UNKNOWN;
@@ -95,14 +95,20 @@ ERRTYPE spawnRuleRunner(Queue_Entry *qentry) {
 	script = JS_CompileScript(cx, global, lentry->logic, strlen(lentry->logic), "<inline>", 0);
 
 	if(script == NULL) {
+		// TODO: Log error to database for script writer to see
 		printf("Couldn't compiled the script\n");
+		JS_DestroyContext(cx);
+		JS_DestroyRuntime(rt);
 		return ERR_UNKNOWN;
 	}
 
 	ret = JS_ExecuteScript(cx, global, script, &rval);
  
 	if(ret == JS_FALSE) {
+		// TODO: Log error to database for script writer to see
 		printf("Failed to run compiled script.\n");
+		JS_DestroyContext(cx);
+		JS_DestroyRuntime(rt);
 		return ERR_UNKNOWN;
 	}
 
@@ -112,7 +118,7 @@ ERRTYPE spawnRuleRunner(Queue_Entry *qentry) {
 
 	JS_DestroyContext(cx);
 	JS_DestroyRuntime(rt);
-	JS_ShutDown();
+	JS_ShutDown();		// Is this needed since thread is ending on return from this function?
 
 	return ERR_NONE;
 }

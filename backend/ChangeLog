@@ -1,3 +1,15 @@
+* 5th Jan 2012
+
+	- Continued patching Thwonk to support Spidermonkey 1.8.5. Can
+	  now use thwonk.file.read(), thwonk.file.write(), thwonk.message.getCurrent(),
+	  thwonk.print(), thwonk.version()
+
+	- Patched thwonk.message.sendAll() and thwonk.message.sendMember()
+	  but from testing doesn't seem to be fully working yet
+
+	- Renamed Javascript object that exposes native methods, from Thwonk to
+	  thwonk
+
 * 29th Dec 2011
 
 	- Re-wrote parts of the code for running Javascript and calling native

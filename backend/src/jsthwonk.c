@@ -155,42 +155,48 @@ JSBool jsObjectThwonk_version(JSContext *cx, uintN argc, jsval *vp) {
  *
  * Entry:
  * 	1st - Context this methods was called from
- * 	2nd - Object associated with this method
- * 	3rd - Number of arguments passed to this method call
+ * 	2nd - Number of arguments passed to this method call
  * 		-- 0
- * 	4th - Array of arguments
+ * 	3rd - Array of arguments
  * 		-- None
- *	5th - Value to return from method call
  *
  * Exit:
  * 	SUCCESS - rval = Content of current message
  * 	FAILURE - rval = TJS_FAILURE
 */
-JSBool jsObjectThwonk_message_getCurrent(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+JSBool jsObjectThwonk_message_getCurrent(JSContext *cx, uintN argc, jsval *vp) {
 	Queue_Entry *qentry;
 	Message_Entry *mentry;
 	JSString *jstr;
+	JSObject *obj;
 
 	if(argc != 0) {
-		*rval = INT_TO_JSVAL(TJS_FAILURE);
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_FAILURE));
+		return JS_TRUE;
+	}
+
+	obj = JS_THIS_OBJECT(cx, vp);
+
+	if(obj == NULL) {
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_FAILURE));
 		return JS_TRUE;
 	}
 
 	qentry = (Queue_Entry *)JS_GetPrivate(cx, obj);
 
 	if(qentry == NULL) {
-		*rval = INT_TO_JSVAL(TJS_FAILURE);
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_FAILURE));
 		return JS_TRUE;
 	}
 
 	if((mentry = getMessageEntryById(qentry->messageId)) == NULL) {
-		*rval = INT_TO_JSVAL(TJS_FAILURE);
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_FAILURE));
 		return JS_TRUE;
 	}
 
 	jstr = JS_NewStringCopyZ(cx, mentry->rawContent);
 
-	*rval = STRING_TO_JSVAL(jstr);
+	JS_SET_RVAL(cx, vp, STRING_TO_JSVAL(jstr));
 
 	freeMessageEntry(mentry);
 
@@ -204,26 +210,32 @@ JSBool jsObjectThwonk_message_getCurrent(JSContext *cx, JSObject *obj, uintN arg
  *
  * Entry:
  * 	1st - Context this methods was called from
- * 	2nd - Object associated with this method
- * 	3rd - Number of arguments passed to this method call
+ * 	2nd - Number of arguments passed to this method call
  * 		-- 3
- * 	4th - Array of arguments
+ * 	3rd - Array of arguments
  * 		-- 1st = Reserved, should be set to javascript THWONK_UNSET (0)
  * 		-- 2nd = Text of subject
  * 		-- 3rd = Text of message to send
- *	5th - Value to return from method call
  *
  * Exit:
  * 	SUCCESS - rval = current version of thwonk
  * 	FAILURE - rval = TJS_FAILURE
 */
-JSBool jsObjectThwonk_message_sendAll(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+JSBool jsObjectThwonk_message_sendAll(JSContext *cx, uintN argc, jsval *vp) {
 	Queue_Entry *qentry;
+	JSObject *obj;
+
+	obj = JS_THIS_OBJECT(cx, vp);
+
+	if(obj == NULL) {
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_FAILURE));
+		return JS_TRUE;
+	}
 
 	qentry = (Queue_Entry *)JS_GetPrivate(cx, obj);
 
 	if(qentry == NULL) {
-		*rval = INT_TO_JSVAL(TJS_FAILURE);
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_FAILURE));
 		return JS_TRUE;
 	}
 
@@ -239,31 +251,33 @@ JSBool jsObjectThwonk_message_sendAll(JSContext *cx, JSObject *obj, uintN argc, 
  *
  * Entry:
  * 	1st - Context this methods was called from
- * 	2nd - Object associated with this method
- * 	3rd - Number of arguments passed to this method call
+ * 	2nd - Number of arguments passed to this method call
  * 		-- 4
- * 	4th - Array of arguments
+ * 	3rd - Array of arguments
  * 		-- 1st = May be TJS_MAIL_FROM_MEMBER, TJS_MAIL_FROM_THWONK_TO_MEMBER,
  * 			TJS_MAIL_FROM_THWONK_TO_ANYONE
  * 		-- 2nd = Username of member to send messagge to
  * 		-- 3rd = Text of subject to send
  * 		-- 4th = Text of message to send
- *	5th - Value to return from method call
  *
  * Exit:
  * 	SUCCESS - rval = TJS_SUCCESS
  * 	FAILURE - rval = TJS_FAILURE
 */
-JSBool jsObjectThwonk_message_sendMember(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+JSBool jsObjectThwonk_message_sendMember(JSContext *cx, uintN argc, jsval *vp) {
 	Queue_Entry *qentry;
 	char *userUnsafe, *subjectUnsafe, *bodyUnsafe;
 	char *user, *subject, *body;
 	int outType;
+	JSObject *obj;
+	jsval *argv;
 
 	if(argc != 4) {
-		*rval = INT_TO_JSVAL(TJS_FAILURE);
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_FAILURE));
 		return JS_TRUE;
 	}
+
+	argv = JS_ARGV(cx, vp);
 
 	// Should this message be sent from the orginal sender or from the THWONK?
 	// And should it be sendable to members or anyone?
@@ -297,7 +311,7 @@ JSBool jsObjectThwonk_message_sendMember(JSContext *cx, JSObject *obj, uintN arg
 		break;
 
 		default:
-			*rval = INT_TO_JSVAL(TJS_FAILURE);
+			JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_FAILURE));
 			return JS_TRUE;
 	}
 
@@ -309,7 +323,7 @@ JSBool jsObjectThwonk_message_sendMember(JSContext *cx, JSObject *obj, uintN arg
 //	bodyUnsafe = JS_GetStringBytes(JSVAL_TO_STRING(argv[3]));
 
 	if(userUnsafe == NULL || subjectUnsafe == NULL || bodyUnsafe == NULL) {
-		*rval = INT_TO_JSVAL(TJS_FAILURE);
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_FAILURE));
 		return JS_TRUE;
 	}
 
@@ -324,7 +338,7 @@ JSBool jsObjectThwonk_message_sendMember(JSContext *cx, JSObject *obj, uintN arg
 
 	// Now check was escaping of unsafe strings successful
 	if(user == NULL || subject == NULL || bodyUnsafe == NULL) {
-		*rval = INT_TO_JSVAL(TJS_FAILURE);
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_FAILURE));
 		return JS_TRUE;
 	}
 
@@ -332,15 +346,22 @@ JSBool jsObjectThwonk_message_sendMember(JSContext *cx, JSObject *obj, uintN arg
 	// to rewrite the outgoing mail headers. To prevent this NO
 	// newlines are allowed in the subject
 	if(doesStringHaveNewline(subject) == true) {
-		*rval = INT_TO_JSVAL(TJS_ERR_UNSAFE_SUBJECT);
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_ERR_UNSAFE_SUBJECT));
 		return JS_TRUE;
 	}
 
 	// Right, now that everything is setup try and add the mail to the outgoing message queue
+	obj = JS_THIS_OBJECT(cx, vp);
+
+	if(obj == NULL) {
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_FAILURE));
+		return JS_TRUE;
+	}
+
 	qentry = (Queue_Entry *)JS_GetPrivate(cx, obj);
 
 	if(qentry == NULL) {
-		*rval = INT_TO_JSVAL(TJS_FAILURE);
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_FAILURE));
 		return JS_TRUE;
 	}
 
@@ -349,9 +370,9 @@ JSBool jsObjectThwonk_message_sendMember(JSContext *cx, JSObject *obj, uintN arg
 //	if(addMailToOutQueue(i, qentry, user, subject, body) == SUCCESS)
 
 	if(addMailToOutQueue(outType, qentry, user, subject, bodyUnsafe) == SUCCESS) {
-		*rval = INT_TO_JSVAL(TJS_SUCCESS);
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_SUCCESS));
 	} else {
-		*rval = INT_TO_JSVAL(TJS_FAILURE);
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_FAILURE));
     	}
 
 	if(user != NULL)
@@ -372,32 +393,33 @@ JSBool jsObjectThwonk_message_sendMember(JSContext *cx, JSObject *obj, uintN arg
  *
  * Entry:
  * 	1st - Context this methods was called from
- * 	2nd - Object associated with this method
- * 	3rd - Number of arguments passed to this method call
+ * 	2nd - Number of arguments passed to this method call
  * 		-- 1
- * 	4th - Array of arguments
+ * 	3rd - Array of arguments
  * 		-- 1st = Virtual path to the file
- *	5th - Value to return from method call
  *
  * Exit:
  * 	SUCCESS - rval = Content of current message
  * 	FAILURE - rval = TJS_FAILURE
 */
-JSBool jsObjectThwonk_file_read(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+JSBool jsObjectThwonk_file_read(JSContext *cx, uintN argc, jsval *vp) {
 	VFile_Entry *vfile;
 	char *nameUnsafe;
 	char *name;
+	jsval *argv;
 	JSString *jstr;
 
 	if(argc != 1) {
-		*rval = INT_TO_JSVAL(TJS_FAILURE);
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_FAILURE));
 		return JS_TRUE;
 	}
+
+	argv = JS_ARGV(cx, vp);
 
 	nameUnsafe = JS_EncodeString(cx, JS_ValueToString(cx, argv[0]));
 
 	if(nameUnsafe == NULL) {
-		*rval = INT_TO_JSVAL(TJS_FAILURE);
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_FAILURE));
 		return JS_TRUE;
 	}
 
@@ -406,7 +428,7 @@ JSBool jsObjectThwonk_file_read(JSContext *cx, JSObject *obj, uintN argc, jsval 
 	free(nameUnsafe);		// Don't leak memory
 
 	if(name == NULL) {
-		*rval = INT_TO_JSVAL(TJS_FAILURE);
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_FAILURE));
 		return JS_TRUE;
 	}
 
@@ -415,7 +437,7 @@ JSBool jsObjectThwonk_file_read(JSContext *cx, JSObject *obj, uintN argc, jsval 
 		if(name != NULL)
 			free(name);
 
-		*rval = INT_TO_JSVAL(TJS_FAILURE);
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_FAILURE));
 		return JS_TRUE;
 	}
 
@@ -426,7 +448,7 @@ JSBool jsObjectThwonk_file_read(JSContext *cx, JSObject *obj, uintN argc, jsval 
 
 	freeVFileEntry(vfile);
 
-	*rval = STRING_TO_JSVAL(jstr);
+	JS_SET_RVAL(cx, vp, STRING_TO_JSVAL(jstr));
 
 	return JS_TRUE;
 }
@@ -437,33 +459,35 @@ JSBool jsObjectThwonk_file_read(JSContext *cx, JSObject *obj, uintN argc, jsval 
  *
  * Entry:
  * 	1st - Context this methods was called from
- * 	2nd - Object associated with this method
- * 	3rd - Number of arguments passed to this method call
+ * 	2nd - Number of arguments passed to this method call
  * 		-- 2
- * 	4th - Array of arguments
+ * 	3rd - Array of arguments
  * 		-- 1st = Virtual path to the file
  * 		-- 2nd = Contents to store in the file
- *	5th - Value to return from method call
  *
  * Exit:
  * 	SUCCESS - rval = TJS_SUCCESS
  * 	FAILURE - rval = TJS_FAILURE
 */
-JSBool jsObjectThwonk_file_write(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+JSBool jsObjectThwonk_file_write(JSContext *cx, uintN argc, jsval *vp) {
 	Queue_Entry *qentry;
 	char *nameUnsafe, *contentUnsafe;
 	char *name, *content;
+	JSObject *obj;
+	jsval *argv;
 
 	if(argc != 2) {
-		*rval = INT_TO_JSVAL(TJS_FAILURE);
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_FAILURE));
 		return JS_TRUE;
 	}
+
+	argv = JS_ARGV(cx, vp);
 
 	nameUnsafe = JS_EncodeString(cx, JS_ValueToString(cx, argv[0]));
 	contentUnsafe = JS_EncodeString(cx, JS_ValueToString(cx, argv[1]));
 
 	if(nameUnsafe == NULL || contentUnsafe == NULL) {
-		*rval = INT_TO_JSVAL(TJS_FAILURE);
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_FAILURE));
 		return JS_TRUE;
 	}
 
@@ -474,22 +498,29 @@ JSBool jsObjectThwonk_file_write(JSContext *cx, JSObject *obj, uintN argc, jsval
 	free(contentUnsafe);
 
 	if(name == NULL || content == NULL) {
-		*rval = INT_TO_JSVAL(TJS_FAILURE);
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_FAILURE));
 		return JS_TRUE;
 	}
 
     // Get Queue_Entry for setting up vfile_rights correctly
+	obj = JS_THIS_OBJECT(cx, vp);
+
+	if(obj == NULL) {
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_FAILURE));
+		return JS_TRUE;
+	}
+
 	qentry = (Queue_Entry *)JS_GetPrivate(cx, obj);
 
 	if(qentry == NULL) {
-		*rval = INT_TO_JSVAL(TJS_FAILURE);
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_FAILURE));
 		return JS_TRUE;
 	}
 
 	if(insertVFileEntryByName(name, content, qentry) == false)
-		*rval = INT_TO_JSVAL(TJS_FAILURE);
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_FAILURE));
 	else
-		*rval = INT_TO_JSVAL(TJS_SUCCESS);
+		JS_SET_RVAL(cx, vp, INT_TO_JSVAL(TJS_SUCCESS));
 
 	if(name != NULL)
 		free(name);
