@@ -9,57 +9,30 @@ This is the initial integrated tarball, where sub-packages are on different vers
   Contains django web frontend and startup scripts for launching
 
 
-Thwonk is a bit like and pre-dates node.js, except it’s for messaging and online communication systems.
-The purpose of Thwonk is to enable developers to easily and quickly create and prototype new kinds of
-Internet messaging and communication systems.
+Thwonk is a bit like node.js, except it’s for messaging and online communication systems. The purpose of Thwonk is to enable developers to easily and quickly create and prototype new kinds of Internet messaging and communication systems.
 
-A key aspect of Thwonk is that you program the messaging system rules and constraints in Javascript.
-I’ve taken the Spidermonkey Javascript engine, extended it, and built it into some custom written C
+A key aspect of Thwonk is that you program the messaging system rules and constraints in Javascript. I’ve taken the Spidermonkey Javascript engine, extended it, and built it into some custom written C
 daemons that handle and hide the complexity of messaging systems.
 
-For example, with Thwonk you can easily develop a mailing list that trims all mailing list posts to
-140 characters (a Twitter-like mailing list!). In Thwonk, this Twitter-like mailing list works as
-follows:
+For example, with Thwonk you can easily develop a mailing list that trims all mailing list posts to 140 characters (a Twitter-like mailing list!). In Thwonk, this Twitter-like mailing list works as follows:
 1. A message (in this case an email) arrives at a Thwonk email address, such as play@thwonk.com
-2. Thwonk daemons take the message, look at the destination address, and based on the address find
-the Javascript associated with that destination address
+2. Thwonk daemons take the message, look at the destination address, and based on the address find the Javascript associated with that destination address
 4. Thwonk daemons then run the Javascript associated with the address (in a sandboxed environment)
-3. The Javascript does whatever you’ve programmed it to do with the incoming message, e.g. trim the
-message to 140 characters
-4. Your Javascript code then sends outgoing messages, e.g. send trimmed message to all play@thwonk.com
-subscribers
+3. The Javascript does whatever you’ve programmed it to do with the incoming message, e.g. trim the message to 140 characters
+4. Your Javascript code then sends outgoing messages, e.g. send trimmed message to all play@thwonk.com subscribers
 
-You can easily imagine other kinds of messaging rules, e.g. a mailing list where everyone on the list
-can only post once a day, or where all mailing list subscribers HAVE to post once a day (otherwise
-automatically unsubscribe them). As Thwonk matures I’ll extend it so you’ll be able to play with the
-rules of other online communication systems, such as web forums.
+You can easily imagine other kinds of messaging rules, e.g. a mailing list where everyone on the list can only post once a day, or where all mailing list subscribers HAVE to post once a day (otherwise automatically unsubscribe them). As Thwonk matures I’ll extend it so you’ll be able to play with the rules of other online communication systems, such as web forums.
 
-With this first version of Thwonk you can create new kinds of mailing lists in Javascript. You don’t
-have to worry about handling multiple messages arriving at once, nor worry about message queues,
-managing message delivery protocols, handling high and low loads, resource management (Javascript in
-an infinite loop is automatically stopped), etc. As Thwonk develops I’ll add support for other
-messaging protocols and communication frameworks, such as Web Services, XMPP, Twitter and Facebook.
+With this first version of Thwonk you can create new kinds of mailing lists in Javascript. You don’t have to worry about handling multiple messages arriving at once, nor worry about message queues, managing message delivery protocols, handling high and low loads, resource management (Javascript in an infinite loop is automatically stopped), etc. As Thwonk develops I’ll add support for other messaging protocols and communication frameworks, such as Web Services, XMPP, Twitter and Facebook.
 
 The source code for Thwonk is up on Github:
 www.github.com/mikemb/thwonk (see backend dir)
-This alpha version 2 code compiles to a set of daemons that run on Unix servers, talk to SQL databases,
-and run Javascript (in a sandboxed environment on a backend server).
+This alpha version 2 code compiles to a set of daemons that run on Unix servers, talk to SQL databases, and run Javascript (in a sandboxed environment on a backend server).
 
-Thwonk provides multiple message queues, both incoming and outgoing – so you can easily have many
-types of parallel messaging systems running on a single Thwonk server. There’s also a virtual file
-system (VFS) for storing and publishing files, esp. handy for building messaging archives and
-publishing them on web. One great benefit of the VFS is you can serialize and deserialize Javascript
-objects to it, which makes storing state information easy, e.g. store a list of the mailing list
-subscribers in a Javascript Object or as a JSON file. There’s also security models, user rights and
-synchronization management (you don’t need to worry about handling multiple messages arriving at 
-once) – but I won’t get into that today.
+Thwonk provides multiple message queues, both incoming and outgoing – so you can easily have many types of parallel messaging systems running on a single Thwonk server. There’s also a virtual file system (VFS) for storing and publishing files, esp. handy for building messaging archives and publishing them on web. One great benefit of the VFS is you can serialize and deserialize Javascript objects to it, which makes storing state information easy, e.g. store a list of the mailing list subscribers in a Javascript Object or as a JSON file. There’s also security models, user rights and synchronization management (you don’t need to worry about handling multiple messages arriving atonce) – but I won’t get into that today.
 
-There is a fronted for Thwonk, which I’ve written in Django and Python. I want to tidy the frontend
-up a bit before publishing the code. With the frontend, anyone can create their own Thwonks and write
-the Javascript for the Thwonk rules in a simple online web IDE. In the next few weeks I’ll setup a
-public Thwonk server you can play with it.
+There is a fronted for Thwonk, which I’ve written in Django and Python. I want to tidy the frontend up a bit before publishing the code. With the frontend, anyone can create their own Thwonks and write the Javascript for the Thwonk rules in a simple online web IDE. In the next few weeks I’ll setup a public Thwonk server you can play with it.
 
-This version of Thwonk compiles against the 1.6 branch of Spidermonkey on Linux. I’ll be shortly
-updating the code to support the recent 1.8 branch of Spidermonkey and recent versions of the
-mailutils dev libraries. There are automated build scripts for the backend, i.e. configure; make.
-Thwonk currently depends on spider monkey 1.6, libmailutils 1.2 and mysql dev libraries.
+This version of Thwonk compiles against the 1.6 branch of Spidermonkey on Linux. I’ll be shortly updating the code to support the recent 1.8 branch of Spidermonkey and recent versions of the mailutils dev libraries. There are automated build scripts for the backend, i.e. configure; make. Thwonk currently depends on spider monkey 1.6, libmailutils 1.2 and mysql dev libraries.
+
+Thwonk was inspired by a previous project called BumpList, which I co-created with Jonah Brucker-Cohen. 
