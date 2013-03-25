@@ -11,8 +11,7 @@ This is the initial integrated tarball, where sub-packages are on different vers
 
 Thwonk is a bit like node.js, except it’s for messaging and online communication systems. The purpose of Thwonk is to enable developers to easily and quickly create and prototype new kinds of Internet messaging and communication systems.
 
-A key aspect of Thwonk is that you program the messaging system rules and constraints in Javascript. I’ve taken the Spidermonkey Javascript engine, extended it, and built it into some custom written C
-daemons that handle and hide the complexity of messaging systems.
+A key aspect of Thwonk is that you program the messaging system rules and constraints in Javascript. I’ve taken the Spidermonkey Javascript engine, extended it, and built it into some custom written C daemons that handle and hide the complexity of messaging systems.
 
 For example, with Thwonk you can easily develop a mailing list that trims all mailing list posts to 140 characters (a Twitter-like mailing list!). In Thwonk, this Twitter-like mailing list works as follows:
 1. A message (in this case an email) arrives at a Thwonk email address, such as play@thwonk.com
